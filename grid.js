@@ -14,6 +14,35 @@ class Grid {
         this.calculaVecinos();
     }
 
+    descubrirCeldas(x, y) {
+        // Primero desvelamos todas las celdas alrededor de la celda actual (sin recursión aún)
+        let celdasConCeroVecinos = [];
+
+        for (let dx = x - 1; dx <= x + 1; dx++) {
+            for (let dy = y - 1; dy <= y + 1; dy++) {
+                // Evitar la celda central (x, y)
+                if (!(dx === 0 && dy === 0)) {
+
+                    // Si la nueva posición está dentro de los límites y no ha sido descubierta
+                    if (this.isSafe(dx, dy) && !this.celdas[dx][dy].descubierta) {
+                        // Desvelar la celda
+                        this.celdas[dx][dy].descubierta = true;
+
+                        // Si la celda descubierta tiene 0 vecinos, la guardamos para procesarla después
+                        if (this.celdas[dx][dy].vecinos === 0) {
+                            celdasConCeroVecinos.push([dx, dy]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Una vez desveladas todas las celdas alrededor, procesamos las que tienen 0 vecinos
+        for (let [dx, dy] of celdasConCeroVecinos) {
+            this.descubrirCeldas(dx, dy);  // Aquí hacemos la recursión
+        }
+    }
+
     isSafe(x, y) {
         return (x >= 0 && x < this.ancho && y >= 0 && y < this.alto)
     }
@@ -68,12 +97,17 @@ class Grid {
                 if (x == mx & y == my) {
                     fill("black")
                 } else {
-                    fill("lightgrey")
+                    fill("#ACAEAE")
                 }
                 rect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize)
 
+                if (this.celdas[x][y].bandera) {
+                    textSize(this.cellSize - 2)
+                    text('🚩', x * this.cellSize - 1, y * this.cellSize + 16)
+                }
+
                 if (this.celdas[x][y].descubierta) {
-                    fill("grey")
+                    fill("#D0D1D1")
                     rect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize)
                     if (this.celdas[x][y].bomba) {
                         textSize(this.cellSize - 2)
