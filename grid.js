@@ -15,31 +15,16 @@ class Grid {
     }
 
     descubrirCeldas(x, y) {
-        // Primero desvelamos todas las celdas alrededor de la celda actual (sin recursión aún)
-        let celdasConCeroVecinos = [];
+        this.celdas[x][y].descubierta = true;
 
-        for (let dx = x - 1; dx <= x + 1; dx++) {
-            for (let dy = y - 1; dy <= y + 1; dy++) {
-                // Evitar la celda central (x, y)
-                if (!(dx === 0 && dy === 0)) {
-
-                    // Si la nueva posición está dentro de los límites y no ha sido descubierta
+        if (this.celdas[x][y].vecinos == 0) {
+            for (let dx = x - 1; dx <= x + 1; dx++) {
+                for (let dy = y - 1; dy <= y + 1; dy++) {
                     if (this.isSafe(dx, dy) && !this.celdas[dx][dy].descubierta) {
-                        // Desvelar la celda
-                        this.celdas[dx][dy].descubierta = true;
-
-                        // Si la celda descubierta tiene 0 vecinos, la guardamos para procesarla después
-                        if (this.celdas[dx][dy].vecinos === 0) {
-                            celdasConCeroVecinos.push([dx, dy]);
-                        }
+                        this.descubrirCeldas(dx, dy);
                     }
                 }
             }
-        }
-
-        // Una vez desveladas todas las celdas alrededor, procesamos las que tienen 0 vecinos
-        for (let [dx, dy] of celdasConCeroVecinos) {
-            this.descubrirCeldas(dx, dy);  // Aquí hacemos la recursión
         }
     }
 
